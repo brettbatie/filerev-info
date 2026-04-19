@@ -109,6 +109,11 @@ Users get an email when a scan completes.
 - Preserves original folder hierarchy by restoring top-level folders before nested ones (Google's native flow restores orphaned intermediates to Drive root, which Filerev avoids).
 - Found under "Files by Category" page → trash row → 3-dot menu → "Restore Files in Trash".
 
+### Export Google Drive File List (CSV Export)
+- Exports a list of files and per-file metadata from any Filerev category to a CSV report.
+- Available on every category view (Duplicates, Hidden, Empty, Large, Old, Shared, Temporary, Files by Type, Files by Extension, Folder Sizes, etc.) and respects any filters applied — so a user can export "all files", "files over X MB", "files in a specific folder", "PDFs older than 2 years", and similar slices.
+- Use cases: auditing what's in a Google Drive account, compliance/retention reviews, sharing an inventory with a client or manager, migration planning, spotting ownership issues, and general "what do I actually have in Drive?" reporting.
+
 ### Filters (cross-cutting feature)
 Available on category views to narrow results before taking action. Filter dimensions:
 - File creation date (range)
