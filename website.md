@@ -45,6 +45,13 @@ Users get an email when a scan completes.
 - No hard limit beyond plan quotas; works where Google Drive's native UI can only select ~100 files at a time.
 - Files go to Google Drive trash (30-day recovery window).
 
+### Move Files (Bulk Move)
+- Move selected files from the current results view into a target folder.
+- Operates on files loaded on the current results pages (results are paginated at ~100 files per page; scrolling/loading more pages makes more files available to select).
+- Unlike Bulk File Deleter, Move does **not** have a "move every file in this category" one-click action — selection is explicit from loaded results.
+- Use cases: archival, reorganizing into folders, consolidating clutter without deleting.
+- Moves count against the monthly "moves & deletions" plan quota.
+
 ### Hidden File Finder
 - Finds "orphaned" files — files that exist in Google Drive but aren't inside any folder the user can browse to (commonly caused when someone else deletes a shared parent folder while the file inside is owned by the user).
 - Hidden files still count against the Google Drive storage quota.
@@ -56,15 +63,16 @@ Users get an email when a scan completes.
 - Also exposes empty folders.
 - Supports filters (folder, owner, file type, creation date) and bulk delete.
 
-### Folder Size Analyzer
-- Shows folder sizes (Google Drive does not expose this natively).
-- Tree-based browsing with graphical size representation; largest folders first.
+### Storage Analyzer (aka Folder Size Analyzer)
+- Shows folder sizes in a browsable hierarchy tree with graphical size representation; largest folders first.
+- Google Drive does not expose folder sizes natively; Filerev computes them from metadata.
 - Can scan a single folder or a subset without scanning the whole Drive.
 - Does not download files — reads metadata, so it's fast regardless of network speed.
+- "Storage Analyzer" and "Folder Size Analyzer" refer to the same feature/view.
 
-### Storage Analyzer
-- High-level view of storage across Google Drive, Gmail, Google Photos, and uncategorized (e.g., third-party apps, Android/iOS backups, Google One shared pools).
-- Breakdown by custom categories (duplicate, hidden, empty, large, old, shared, temporary, trash) and by file type (Documents, Photos, Audio, Video, Archive).
+### Storage Summary
+- High-level chart showing storage used across Google Drive, Gmail, Google Photos, and uncategorized (e.g., third-party apps, Android/iOS backups, Google One shared pools).
+- Additional breakdowns by custom categories (duplicate, hidden, empty, large, old, shared, temporary, trash) and by file type (Documents, Photos, Audio, Video, Archive).
 - Graphical storage usage visualization.
 - **Scope note**: Filerev *displays* storage usage for Gmail and Google Photos but does not find or delete duplicates inside them. Duplicate and cleanup tools operate on Google Drive only.
 - Note re: Google Docs/Sheets/Slides — these count against quota unless created before 2021-06-01 and never edited after that date.
@@ -239,6 +247,7 @@ When a user's Drive exceeds their plan's file limit, they receive an email promp
 
 - **Duplicate definition**: content is 100% byte-identical. Not filename-based, not fuzzy. Google proprietary formats (Docs/Sheets/Slides) are not currently checked for duplicates.
 - **Deletions are soft**: always go to Google Drive trash. 30-day recovery window before permanent deletion. Filerev's "Restore Trash" tool can pull them back en masse.
+- **Move vs. Delete scope differs**: Bulk Delete can act on an entire category (with or without filters) in one action. Move operates only on files explicitly selected from loaded results pages (~100/page) — there is no "move every file in this category" equivalent. This distinction matters when describing what "bulk" means for each operation.
 - **Hidden/orphaned file mechanism**: occurs when a file's parent folder (owned by someone else) is deleted. The file persists, still counts against quota, but isn't reachable via normal browsing.
 - **Google Drive's native limitations that Filerev works around**:
   - No folder-size display
@@ -255,4 +264,4 @@ When a user's Drive exceeds their plan's file limit, they receive an email promp
   - Each Shared Drive has its own trash that counts against Workspace storage separately from My Drive trash.
   - After mass deletions, Google can take up to ~24 hours to update reported storage usage.
   - "Uncategorized" storage typically comes from third-party apps' hidden data folders, Android/iOS device backups, Google One shared storage pools, or other Google services.
-- **Scale claim**: "7.0 billion files scanned, 37 petabytes organized" across the user base.
+- **Scale claim**: "12 billion files scanned, 37 petabytes organized" across the user base.
