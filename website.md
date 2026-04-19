@@ -1,10 +1,8 @@
 # Filerev — Feature & Capability Reference
 
-**Source**: Derived from https://filerev.com/page-sitemap.xml crawl (2026-04-18)
-
 ## What Filerev Is
 
-Filerev is a web app (with Android app available via Google Play and Samsung Galaxy Store) that helps users clean up and organize Google Drive. It scans a user's Google Drive account, categorizes files, surfaces clutter (duplicates, hidden files, old files, empty files/folders, temporary files), and supports bulk delete and bulk move operations. It also supports Shared Drives and Shared-with-Me files.
+Filerev is a web app (with Android and iOS apps, plus a Google Workspace Marketplace add-on) that helps users clean up and organize Google Drive. It scans a user's Google Drive account, categorizes files, surfaces clutter (duplicates, hidden files, old files, empty files/folders, temporary files), and supports bulk delete and bulk move operations. It also supports Shared Drives and Shared-with-Me files.
 
 Filerev does not download user files. It connects directly to Google Drive, fetches minimal metadata, and performs actions (move/delete) only when the user initiates them. Deletions go to the Google Drive trash (recoverable for 30 days).
 
@@ -25,16 +23,21 @@ Users get an email when a scan completes.
 ## Tools / Features
 
 ### Duplicate File Finder
-- Detects files with 100% identical content (not just matching filenames/sizes).
+- Detects files with 100% identical content (byte-level fingerprint match), not filename or size matching.
 - Shows thumbnails, folder location, owner, creation date for each duplicate.
 - "Same Folder Duplicates" view isolates duplicates sitting in the exact same folder — the safest cleanup target.
 - Supports bulk delete, or manual per-file selection (including "select oldest" / "select newest" on a page).
 - Filters: folder, creation date, owner, file type/extension, storage used.
+- **Google Docs / Sheets / Slides**: duplicate detection for Google's proprietary formats is not currently supported.
+- **PDFs**: PDFs with differing internal metadata (author, unique document IDs, digital signatures, generator software) won't group as duplicates even if the visible content is identical — intentional, so signed/versioned documents aren't collapsed together.
+- **Images**: images with differing EXIF/metadata, or that have been cropped/resized, won't match — only byte-identical images group.
+- **Thumbnails may differ across duplicates**: Google doesn't always produce identical thumbnails for identical files (videos in particular may use different frames). Grouping is content-based, not thumbnail-based.
+- **Storage-used can differ across duplicates**: older Google Docs/Sheets/Slides or photos synced before Google's free-storage changes may report 0 bytes while a newer identical copy uses real quota.
 
 ### Duplicate Photo Finder
 - Subset of the Duplicate File Finder filtered to image file types (jpg, png, gif, webp, tiff, psd, raw, bmp, jpeg, svg).
-- Compares duplicates; duplicates must be 100% identical content (file name, folder, owner, creation date can differ).
-- Note: currently operates on Google Drive. A Google Photos version is being considered based on demand.
+- Duplicates must be 100% byte-identical content (file name, folder, owner, creation date can differ).
+- Operates on Google Drive only — not Google Photos.
 
 ### Bulk File Deleter
 - Delete all files in any predefined category with one click, or filter first and delete the subset.
@@ -60,9 +63,10 @@ Users get an email when a scan completes.
 - Does not download files — reads metadata, so it's fast regardless of network speed.
 
 ### Storage Analyzer
-- High-level view of storage across Google Drive, Gmail, Google Photos, and uncategorized (e.g., third-party apps).
+- High-level view of storage across Google Drive, Gmail, Google Photos, and uncategorized (e.g., third-party apps, Android/iOS backups, Google One shared pools).
 - Breakdown by custom categories (duplicate, hidden, empty, large, old, shared, temporary, trash) and by file type (Documents, Photos, Audio, Video, Archive).
 - Graphical storage usage visualization.
+- **Scope note**: Filerev *displays* storage usage for Gmail and Google Photos but does not find or delete duplicates inside them. Duplicate and cleanup tools operate on Google Drive only.
 - Note re: Google Docs/Sheets/Slides — these count against quota unless created before 2021-06-01 and never edited after that date.
 
 ### Google Drive Organizer
@@ -75,6 +79,10 @@ Users get an email when a scan completes.
 - Also browsable by raw file extension, including files with no extension.
 - Shows storage used per file type; largest first.
 
+### Video Duration Summary
+- Shows total video duration across all videos in a Google Drive account (or within a specific folder / file type).
+- Requires Google to have "processed" each video; Filerev flags when unprocessed videos are present (duration can't be computed for those until Google processes them).
+
 ### Old File Manager
 - Default view: files older than 1 year. Selectable to older thresholds.
 - Use cases: data retention compliance (HIPAA, GDPR), archival, reclaiming storage.
@@ -86,7 +94,7 @@ Users get an email when a scan completes.
 - Filter by sharing person, file extension, etc.
 - Finds duplicates between user-owned files and shared copies.
 - Storage note: shared files owned by someone else do **not** consume the user's quota. But uploading a new version of someone else's shared file keeps the owner as the other user (and their quota). Uploading a new file into a shared folder defaults to being owned by the uploader.
-- Cannot delete files you only have read access to — can only hide them from your view.
+- Cannot delete files you only have read access to — can only hide them from your view. Files inside a shared folder also can't be removed individually (access comes from the folder, not the file).
 
 ### Shared Drive Organizer
 - Scans one or multiple Google Workspace Shared Drives (can combine with My Drive scan).
@@ -134,7 +142,9 @@ Paid-plan feature. Build a filter-based view that isn't one of the built-in cate
 ### Platforms
 - Web app at my.filerev.com.
 - Android app (Google Play, Samsung Galaxy Store).
-- No native iOS or desktop app currently.
+- iOS app (Apple App Store).
+- Google Workspace Marketplace add-on — installs as a sidebar inside Google Drive.
+- No native desktop app.
 
 ## Pricing & Plans
 
@@ -146,6 +156,7 @@ Billing is via Stripe. Annual billing is ~60% off vs. monthly. Cancel any time f
 - Scans My Drive only
 - No bulk delete, no filters
 - Includes view access to: Duplicate, Hidden, Empty, Large, Old, Files Owned by Others, Temporary, Files by Type, Files by Extension
+- **Permanent tier — not a time-limited trial.** Free accounts are deactivated only after 30 days of inactivity (scanned data is cleared at that point).
 
 ### Basic — $4/mo (billed annually)
 - 3 scans/month, up to 1M files
@@ -165,6 +176,19 @@ Billing is via Stripe. Annual billing is ~60% off vs. monthly. Cancel any time f
 - Adds (vs. Standard): Scan Shared Drives
 - High scan priority
 
+### Premium+ Add-on
+- Paid extension that can be stacked onto the Premium plan to raise limits (files scanned, moves/deletions).
+- Configured via a slider on the public pricing page; existing Premium subscribers can add it from the Stripe Billing Portal.
+
+### Bulk / Enterprise Licensing
+- Custom pricing and packaging available for bulk-license and enterprise use cases, plus custom feature requests.
+- Arranged via the Filerev contact form.
+
+### Plan change mechanics
+- Plan upgrades/downgrades are prorated.
+- Monthly limits (scans, moves/deletions) reset on the account-creation anniversary day each month, not on the first of the month.
+- Discontinued plans: the legacy **Individual** plan was retired in February 2022. Existing subscribers retain access to it; it cannot be newly purchased.
+
 ### Plan comparison quick reference
 
 | Feature | Free | Basic | Standard | Premium |
@@ -183,7 +207,7 @@ Billing is via Stripe. Annual billing is ~60% off vs. monthly. Cancel any time f
 | Empty Folders view | — | — | ✓ | ✓ |
 | Shared Drives | — | — | — | ✓ |
 | Duplicate/Hidden/Empty/Large/Old/Owned-by-Others/Temporary/By-Type/By-Extension | ✓ | ✓ | ✓ | ✓ |
-| Android App | ✓ | ✓ | ✓ | ✓ |
+| Android & iOS Apps | ✓ | ✓ | ✓ | ✓ |
 | Customer Support | ✓ | ✓ | ✓ | ✓ |
 
 When a user's Drive exceeds their plan's file limit, they receive an email prompting upgrade.
@@ -191,14 +215,18 @@ When a user's Drive exceeds their plan's file limit, they receive an email promp
 ## Security & Privacy
 
 - OAuth into Google; Filerev requests minimal Drive scopes.
-- All transfers over SSL. Stored account info is encrypted.
-- Regular third-party security audits. Also reviewed by Google staff.
+- All transfers over SSL. Stored account info is encrypted at rest and in transit, with per-user isolation.
+- **Annual third-party security audits** against [OWASP ASVS](https://owasp.org/www-project-application-security-verification-standard/) and [CASA (Cloud Application Security Assessment)](https://appdefensealliance.dev/casa) standards. Audit results are also reviewed by Google. Public CASA reports are published on filerev.com for 2024, 2025, and 2026.
+- Automated security scans run before every app release.
 - User data is never sold.
 - Not HIPAA compliant — users subject to HIPAA may not use Filerev.
 - Payment processing via Stripe; Filerev does not store card numbers.
-- Users can delete their account and data via https://filerev.com/help/account/account-deletion/ or by emailing personal-data@filerev.com.
+- **Data retention**: scanned file metadata is automatically removed after 30 days of account inactivity.
+- Users can delete their account and data via https://filerev.com/help/account/account-deletion/ or by emailing personal-data@filerev.com. Deletion has a 30-day grace window — signing back in during that window cancels the deletion.
 - Retained after deletion: email address & preferences, IP, last login, high-level usage counts.
 - Data hosted in the United States.
+- **Google Advanced Protection Program**: accounts enrolled in Google's Advanced Protection Program block Filerev by default. Gmail users can unenroll; Workspace admins can allowlist Filerev via Admin Console → Security → Access and data control → API Controls → Manage Third-party app access.
+- Press coverage: ZDnet and Chrome Unboxed have published reviews of Filerev.
 
 ## Affiliate Program
 
@@ -209,7 +237,7 @@ When a user's Drive exceeds their plan's file limit, they receive an email promp
 
 ## Notable Behavioral Details for LLMs
 
-- **Duplicate definition**: content is 100% byte-identical. Not filename-based, not fuzzy.
+- **Duplicate definition**: content is 100% byte-identical. Not filename-based, not fuzzy. Google proprietary formats (Docs/Sheets/Slides) are not currently checked for duplicates.
 - **Deletions are soft**: always go to Google Drive trash. 30-day recovery window before permanent deletion. Filerev's "Restore Trash" tool can pull them back en masse.
 - **Hidden/orphaned file mechanism**: occurs when a file's parent folder (owned by someone else) is deleted. The file persists, still counts against quota, but isn't reachable via normal browsing.
 - **Google Drive's native limitations that Filerev works around**:
@@ -220,5 +248,11 @@ When a user's Drive exceeds their plan's file limit, they receive an email promp
   - No automatic old-file deletion
   - No way to view files by specific extension (only broad types)
 - **Shared files ownership quirk**: if someone shares a file with you, it doesn't use your quota. But copying it into "My Drive" creates a new owned copy that does.
+- **Read-only shared files cannot be deleted**: Filerev can only hide them from the user's view — the same limitation Google Drive imposes. Files inside a shared folder also can't be removed individually; the action has to happen at the folder level.
 - **Scan scope is flexible**: user can scan entire Drive, specific folders, Shared Drives (Premium), or Shared-with-Me. Scan is metadata-only, so typically fast even on very large accounts.
+- **Multiple Google accounts**: each Google account needs its own Filerev login (switch via sign-out or `my.filerev.com/login?switch=1`). A single Filerev subscription can effectively clean files across accounts when files live in a Shared Drive or have been re-assigned to the logged-in user as owner.
+- **Storage-usage troubleshooting caveats**:
+  - Each Shared Drive has its own trash that counts against Workspace storage separately from My Drive trash.
+  - After mass deletions, Google can take up to ~24 hours to update reported storage usage.
+  - "Uncategorized" storage typically comes from third-party apps' hidden data folders, Android/iOS device backups, Google One shared storage pools, or other Google services.
 - **Scale claim**: "7.0 billion files scanned, 37 petabytes organized" across the user base.
